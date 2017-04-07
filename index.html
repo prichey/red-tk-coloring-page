@@ -11,21 +11,41 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <meta name="msapplication-config" content="/assets/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style media="screen">
       html,
       body {
         margin: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
       }
 
       #coloring-page {
         height: calc(100vh - 50px);
+        width: calc(100vw - 50px);
         padding: 25px;
+        display: block;
+        position: relative;
+      }
+
+      @media screen and (max-width: 768px) {
+        #coloring-page {
+          height: calc(100vh - 20px);
+          width: calc(100vw - 20px);
+          padding: 10px;
+        }
       }
 
       #coloring-page svg {
-        height: 100%;
+        max-height: 100%;
+        max-width: 100%;
         margin: 0 auto;
         display: block;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
     </style>
   </head>
@@ -13731,22 +13751,29 @@
     </div>
     <script src="assets/jquery.min.js"></script>
     <script type="text/javascript">
-      var completionRequirement = 0.35;
+      // var completionRequirement = 0.35;
+      var completionRequirement = 0.005;
 
       $(document).ready(function() {
+        // // fix image height
+        // var $window = $(window);
+        // if ($window.width() < $window.height()) {
+        //   var $svg = $('#coloring-page');
+        //   $svg.css({'height': 'inherit', 'width': 'calc(100vw - 50px)'});
+        // }
+
         var $groups = $('g');
         var numGroups = $groups.length;
         var completedGroups = 0;
-        $groups.on('mouseenter', function() {
+        $groups.on('mouseenter touchmove', function() {
           var $this = $(this);
           completedGroups++;
-          $this.css('padding', '100px');
           $this.find(':not(g)').css({'fill': '#FF0000', transition: "0.1s"});
           console.log(completedGroups, numGroups);
           if (completedGroups > (numGroups * completionRequirement)) {
             console.log('done');
             $groups.find(':not(g)').css({'fill': '#FF0000', transition: "1000ms"});
-            $groups.off('mouseenter');
+            $groups.off('mouseenter touchmove');
           }
         })
       });
