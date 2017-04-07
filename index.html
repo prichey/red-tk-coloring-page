@@ -19,6 +19,8 @@
         height: 100%;
         width: 100%;
         overflow: hidden;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        color: #ff0000;
       }
 
       #coloring-page {
@@ -29,12 +31,15 @@
         position: relative;
       }
 
-      @media screen and (max-width: 768px) {
-        #coloring-page {
-          height: calc(100vh - 20px);
-          width: calc(100vw - 20px);
-          padding: 10px;
-        }
+      #mobile-instructions {
+        display: none;
+        position: absolute;
+        top: 10%;
+        z-index: 5;
+        font-size: 14px;
+        text-align: center;
+        font-style: italic;
+        width: 100%;
       }
 
       #coloring-page svg {
@@ -47,10 +52,23 @@
         left: 50%;
         transform: translate(-50%, -50%);
       }
+
+      @media screen and (max-width: 768px) {
+        #coloring-page {
+          height: calc(100vh - 20px);
+          width: calc(100vw - 20px);
+          padding: 10px;
+        }
+
+        #mobile-instructions {
+          display: block;
+        }
+      }
     </style>
   </head>
   <body>
     <!-- <img id="coloring-page" src="assets/page.svg" alt="Coloring Page"> -->
+    <p id="mobile-instructions">tap tap tap</p>
     <div id="coloring-page">
       <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
       	 viewBox="0 0 612 792" style="enable-background:new 0 0 612 792;" xml:space="preserve">
@@ -13751,29 +13769,33 @@
     </div>
     <script src="assets/jquery.min.js"></script>
     <script type="text/javascript">
-      // var completionRequirement = 0.35;
-      var completionRequirement = 0.005;
-
       $(document).ready(function() {
-        // // fix image height
-        // var $window = $(window);
-        // if ($window.width() < $window.height()) {
-        //   var $svg = $('#coloring-page');
-        //   $svg.css({'height': 'inherit', 'width': 'calc(100vw - 50px)'});
-        // }
+        var completionRequirement;
+        if ($(window).width() < 480) {
+          completionRequirement = 0.1;
+        } else {
+          completionRequirement = 0.35;
+        }
 
         var $groups = $('g');
-        var numGroups = $groups.length;
         var completedGroups = 0;
-        $groups.on('mouseenter touchmove', function() {
+        var showEvents = 'mouseenter click tap touch';
+
+        var $instructions = $('#mobile-instructions');
+
+        $groups.on(showEvents, function() {
           var $this = $(this);
           completedGroups++;
+          if ($instructions.is(':visible')) {
+            $instructions.animate({'opacity': '0'}, 500, function() {
+              $instructions.hide();
+            });
+          }
+
           $this.find(':not(g)').css({'fill': '#FF0000', transition: "0.1s"});
-          console.log(completedGroups, numGroups);
-          if (completedGroups > (numGroups * completionRequirement)) {
-            console.log('done');
+          if (completedGroups > ($groups.length * completionRequirement)) {
             $groups.find(':not(g)').css({'fill': '#FF0000', transition: "1000ms"});
-            $groups.off('mouseenter touchmove');
+            $groups.off(showEvents);
           }
         })
       });
